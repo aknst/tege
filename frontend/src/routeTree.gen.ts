@@ -13,82 +13,209 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as MainImport } from './routes/_main'
+import { Route as BlankImport } from './routes/_blank'
+import { Route as MainProfileSettingsImport } from './routes/_main/profile/settings'
+import { Route as BlankAuthRegisterImport } from './routes/_blank/auth.register'
+import { Route as BlankAuthLoginImport } from './routes/_blank/auth.login'
 
 // Create Virtual Routes
 
-const AboutLazyImport = createFileRoute('/about')()
-const IndexLazyImport = createFileRoute('/')()
+const MainIndexLazyImport = createFileRoute('/_main/')()
+const MainAboutLazyImport = createFileRoute('/_main/about')()
 
 // Create/Update Routes
 
-const AboutLazyRoute = AboutLazyImport.update({
-  id: '/about',
-  path: '/about',
+const MainRoute = MainImport.update({
+  id: '/_main',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+} as any)
 
-const IndexLazyRoute = IndexLazyImport.update({
+const BlankRoute = BlankImport.update({
+  id: '/_blank',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MainIndexLazyRoute = MainIndexLazyImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+  getParentRoute: () => MainRoute,
+} as any).lazy(() => import('./routes/_main/index.lazy').then((d) => d.Route))
+
+const MainAboutLazyRoute = MainAboutLazyImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => MainRoute,
+} as any).lazy(() => import('./routes/_main/about.lazy').then((d) => d.Route))
+
+const MainProfileSettingsRoute = MainProfileSettingsImport.update({
+  id: '/profile/settings',
+  path: '/profile/settings',
+  getParentRoute: () => MainRoute,
+} as any)
+
+const BlankAuthRegisterRoute = BlankAuthRegisterImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => BlankRoute,
+} as any)
+
+const BlankAuthLoginRoute = BlankAuthLoginImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => BlankRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+    '/_blank': {
+      id: '/_blank'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof BlankImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
+    '/_main': {
+      id: '/_main'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainImport
+      parentRoute: typeof rootRoute
+    }
+    '/_main/about': {
+      id: '/_main/about'
       path: '/about'
       fullPath: '/about'
-      preLoaderRoute: typeof AboutLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof MainAboutLazyImport
+      parentRoute: typeof MainImport
+    }
+    '/_main/': {
+      id: '/_main/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof MainIndexLazyImport
+      parentRoute: typeof MainImport
+    }
+    '/_blank/auth/login': {
+      id: '/_blank/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof BlankAuthLoginImport
+      parentRoute: typeof BlankImport
+    }
+    '/_blank/auth/register': {
+      id: '/_blank/auth/register'
+      path: '/auth/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof BlankAuthRegisterImport
+      parentRoute: typeof BlankImport
+    }
+    '/_main/profile/settings': {
+      id: '/_main/profile/settings'
+      path: '/profile/settings'
+      fullPath: '/profile/settings'
+      preLoaderRoute: typeof MainProfileSettingsImport
+      parentRoute: typeof MainImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface BlankRouteChildren {
+  BlankAuthLoginRoute: typeof BlankAuthLoginRoute
+  BlankAuthRegisterRoute: typeof BlankAuthRegisterRoute
+}
+
+const BlankRouteChildren: BlankRouteChildren = {
+  BlankAuthLoginRoute: BlankAuthLoginRoute,
+  BlankAuthRegisterRoute: BlankAuthRegisterRoute,
+}
+
+const BlankRouteWithChildren = BlankRoute._addFileChildren(BlankRouteChildren)
+
+interface MainRouteChildren {
+  MainAboutLazyRoute: typeof MainAboutLazyRoute
+  MainIndexLazyRoute: typeof MainIndexLazyRoute
+  MainProfileSettingsRoute: typeof MainProfileSettingsRoute
+}
+
+const MainRouteChildren: MainRouteChildren = {
+  MainAboutLazyRoute: MainAboutLazyRoute,
+  MainIndexLazyRoute: MainIndexLazyRoute,
+  MainProfileSettingsRoute: MainProfileSettingsRoute,
+}
+
+const MainRouteWithChildren = MainRoute._addFileChildren(MainRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '': typeof MainRouteWithChildren
+  '/about': typeof MainAboutLazyRoute
+  '/': typeof MainIndexLazyRoute
+  '/auth/login': typeof BlankAuthLoginRoute
+  '/auth/register': typeof BlankAuthRegisterRoute
+  '/profile/settings': typeof MainProfileSettingsRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '': typeof BlankRouteWithChildren
+  '/about': typeof MainAboutLazyRoute
+  '/': typeof MainIndexLazyRoute
+  '/auth/login': typeof BlankAuthLoginRoute
+  '/auth/register': typeof BlankAuthRegisterRoute
+  '/profile/settings': typeof MainProfileSettingsRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '/_blank': typeof BlankRouteWithChildren
+  '/_main': typeof MainRouteWithChildren
+  '/_main/about': typeof MainAboutLazyRoute
+  '/_main/': typeof MainIndexLazyRoute
+  '/_blank/auth/login': typeof BlankAuthLoginRoute
+  '/_blank/auth/register': typeof BlankAuthRegisterRoute
+  '/_main/profile/settings': typeof MainProfileSettingsRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | ''
+    | '/about'
+    | '/'
+    | '/auth/login'
+    | '/auth/register'
+    | '/profile/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to:
+    | ''
+    | '/about'
+    | '/'
+    | '/auth/login'
+    | '/auth/register'
+    | '/profile/settings'
+  id:
+    | '__root__'
+    | '/_blank'
+    | '/_main'
+    | '/_main/about'
+    | '/_main/'
+    | '/_blank/auth/login'
+    | '/_blank/auth/register'
+    | '/_main/profile/settings'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  AboutLazyRoute: typeof AboutLazyRoute
+  BlankRoute: typeof BlankRouteWithChildren
+  MainRoute: typeof MainRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  AboutLazyRoute: AboutLazyRoute,
+  BlankRoute: BlankRouteWithChildren,
+  MainRoute: MainRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -101,15 +228,44 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/about"
+        "/_blank",
+        "/_main"
       ]
     },
-    "/": {
-      "filePath": "index.lazy.tsx"
+    "/_blank": {
+      "filePath": "_blank.tsx",
+      "children": [
+        "/_blank/auth/login",
+        "/_blank/auth/register"
+      ]
     },
-    "/about": {
-      "filePath": "about.lazy.tsx"
+    "/_main": {
+      "filePath": "_main.tsx",
+      "children": [
+        "/_main/about",
+        "/_main/",
+        "/_main/profile/settings"
+      ]
+    },
+    "/_main/about": {
+      "filePath": "_main/about.lazy.tsx",
+      "parent": "/_main"
+    },
+    "/_main/": {
+      "filePath": "_main/index.lazy.tsx",
+      "parent": "/_main"
+    },
+    "/_blank/auth/login": {
+      "filePath": "_blank/auth.login.tsx",
+      "parent": "/_blank"
+    },
+    "/_blank/auth/register": {
+      "filePath": "_blank/auth.register.tsx",
+      "parent": "/_blank"
+    },
+    "/_main/profile/settings": {
+      "filePath": "_main/profile/settings.tsx",
+      "parent": "/_main"
     }
   }
 }

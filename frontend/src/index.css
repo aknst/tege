@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -64,13 +63,19 @@
     @apply border-border;
   }
   html {
+    height: 100%;
     @apply scroll-smooth;
   }
   body {
+    height: 100%;
     @apply bg-background text-foreground overscroll-none;
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     overflow-y: scroll;
+  }
+
+  #root {
+    height: 100%;
   }
 
   /* Custom scrollbar styling. Thanks @pranathiperii. */
