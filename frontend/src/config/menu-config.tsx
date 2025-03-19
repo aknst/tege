@@ -33,7 +33,7 @@ export const avatarNav: AvatarNavItem[] = [
   {
     icon: <Settings />,
     label: "Настройки",
-    link: "/settings",
+    link: "/profile/settings",
   },
 ];
 

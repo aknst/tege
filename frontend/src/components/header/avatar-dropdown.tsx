@@ -41,7 +41,7 @@ export default function AvatarDropdown() {
                 {user?.name}
               </p>
               <span className="text-muted-foreground tracking-tight text-[12px] leading-none">
-                123 XP
+                0 XP
               </span>
             </div>
             <Avatar>

@@ -35,36 +35,33 @@ export default function useAuth() {
       router.navigate({ to: getRedirectUrl() });
       successToast("Успешная авторизация");
     } catch (error) {
-      errorToast("Could not log in", error);
+      errorToast("Не удалось авторизоваться", error);
     }
   };
 
   const register = async (newUserData: RegisterFields) => {
     try {
       await createNewUser(newUserData);
-      successToast(
-        "Registration successful!",
-        "Please check your inbox for a verification email"
-      );
+      successToast("Регистрация прошла успешно!", "...");
       await loginWithPasswordApi(newUserData.email, newUserData.password);
       queryClient.invalidateQueries({ queryKey: ["user"] });
       router.navigate({ to: getRedirectUrl() });
     } catch (error) {
-      errorToast("Could not register", error);
+      errorToast("Не удалось зарегистрироваться", error);
     }
   };
 
   const confirmPasswordReset = async (
+    oldPassword: string,
     password: string,
-    passwordConfirm: string,
-    token: string
+    passwordConfirm: string
   ) => {
     try {
-      await confirmPasswordResetApi(password, passwordConfirm, token);
-      successToast("Changed password", "Your password has been updated");
+      await confirmPasswordResetApi(oldPassword, password, passwordConfirm);
+      successToast("Пароль изменен", "Ваш пароль был изменен");
       router.navigate({ to: "/" });
     } catch (error) {
-      errorToast("Could not update password", error);
+      errorToast("Не удалось изменить пароль", error);
     }
   };
 
